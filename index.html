@@ -2,39 +2,179 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ملعبنا</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ملعبنا ⚽</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#071b12;color:white;font-family:Arial;text-align:center}
-header{background:#087f45;padding:30px 15px;border-radius:0 0 25px 25px}
-h1{font-size:32px}
-main{padding:20px;max-width:600px;margin:auto}
-.card{background:#123b29;padding:22px;margin:16px 0;border-radius:18px}
-button{background:#19c56b;color:#062414;border:0;border-radius:12px;padding:13px 22px;font-size:17px;font-weight:bold}
+body{margin:0;background:#071b12;color:white;font-family:Arial,sans-serif}
+header{background:linear-gradient(135deg,#087f45,#10b96b);padding:25px;text-align:center;border-radius:0 0 25px 25px}
+header h1{margin:0;font-size:32px}
+nav{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;padding:15px}
+nav button,.btn{background:#19c56b;color:#062414;border:0;border-radius:10px;padding:11px 15px;font-weight:bold;cursor:pointer}
+main{max-width:750px;margin:auto;padding:15px}
+.page{display:none}
+.page.active{display:block}
+.card{background:#123b29;padding:18px;margin:13px 0;border-radius:16px;border:1px solid #246044}
+h2{color:#5beba0}
+input,select{width:100%;padding:12px;margin:7px 0;border-radius:9px;border:0}
+.small{color:#b9d9c8;font-size:14px}
+button:active{transform:scale(.97)}
+.danger{background:#e45b5b;color:white}
+.badge{color:#ffdf75}
 </style>
 </head>
 <body>
+
 <header>
 <h1>⚽ ملعبنا</h1>
 <p>كل مبارياتك بمكان واحد</p>
 </header>
+
+<nav>
+<button onclick="showPage('home')">الرئيسية</button>
+<button onclick="showPage('pitches')">الملاعب</button>
+<button onclick="showPage('bookings')">حجوزاتي</button>
+<button onclick="showPage('players')">اللاعبون</button>
+<button onclick="showPage('results')">النتائج</button>
+<button onclick="showPage('owner')">إدارة الملعب</button>
+</nav>
+
 <main>
+<section id="home" class="page active">
 <div class="card">
-<h2>🏟️ تنظيم مباراة</h2>
-<p>رتّب لعبتك واجمع أصدقاءك</p>
-<button onclick="alert('قريباً إنشاء مباراة')">إنشاء مباراة</button>
+<h2>أهلاً بك في ملعبنا ⚽</h2>
+<p>احجز ملعبك، اجمع أصدقاءك، ونظّم مبارياتك بسهولة.</p>
+<button class="btn" onclick="showPage('pitches')">استعرض الملاعب</button>
 </div>
 <div class="card">
+<h2>خدماتنا</h2>
+<p>🏟️ حجز الملاعب</p>
+<p>👥 تنظيم اللاعبين</p>
+<p>📊 متابعة النتائج</p>
+</div>
+</section>
+
+<section id="pitches" class="page">
+<h2>🏟️ الملاعب المتاحة</h2>
+<div id="pitchList"></div>
+</section>
+
+<section id="bookings" class="page">
+<h2>📅 حجوزاتي</h2>
+<div id="bookingList"></div>
+</section>
+
+<section id="players" class="page">
 <h2>👥 اللاعبون</h2>
-<p>نظّم فريقك وأسماء اللاعبين</p>
-<button onclick="alert('قريباً إضافة اللاعبين')">اللاعبون</button>
-</div>
 <div class="card">
-<h2>📊 النتائج</h2>
-<p>تابع نتائج مباريات فريقك</p>
-<button onclick="alert('قريباً سجل النتائج')">النتائج</button>
+<input id="playerName" placeholder="اسم اللاعب">
+<button class="btn" onclick="addPlayer()">إضافة لاعب</button>
+<div id="playerList"></div>
 </div>
+</section>
+
+<section id="results" class="page">
+<h2>📊 النتائج</h2>
+<div class="card">
+<input id="team1" placeholder="الفريق الأول">
+<input id="score1" type="number" placeholder="أهداف الفريق الأول">
+<input id="team2" placeholder="الفريق الثاني">
+<input id="score2" type="number" placeholder="أهداف الفريق الثاني">
+<button class="btn" onclick="addResult()">حفظ النتيجة</button>
+<div id="resultList"></div>
+</div>
+</section>
+
+<section id="owner" class="page">
+<h2>⚙️ إدارة الحجوزات</h2>
+<p class="small">لوحة تجريبية لصاحب الملعب على هذا الجهاز.</p>
+<div id="ownerList"></div>
+</section>
 </main>
+
+<script>
+const pitches=[
+{id:1,name:"ملعب الجوهرة",area:"حي السلام",price:50000},
+{id:2,name:"ملعب أرينا السلام",area:"حي السلام",price:40000},
+{id:3,name:"ملعب الكابيتانو",area:"كربلاء",price:35000}
+];
+
+let bookings=JSON.parse(localStorage.getItem("mal3abBookings")||"[]");
+let players=JSON.parse(localStorage.getItem("mal3abPlayers")||"[]");
+let results=JSON.parse(localStorage.getItem("mal3abResults")||"[]");
+
+function save(){
+localStorage.setItem("mal3abBookings",JSON.stringify(bookings));
+localStorage.setItem("mal3abPlayers",JSON.stringify(players));
+localStorage.setItem("mal3abResults",JSON.stringify(results));
+}
+
+function showPage(id){
+document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+render();
+}
+
+function render(){
+document.getElementById("pitchList").innerHTML=pitches.map(p=>`
+<div class="card">
+<h3>🏟️ ${p.name}</h3>
+<p>📍 ${p.area}</p>
+<p>💰 ${p.price.toLocaleString("en-US")} دينار / ساعة</p>
+<button class="btn" onclick="bookPitch(${p.id})">احجز الآن</button>
+</div>`).join("");
+
+document.getElementById("bookingList").innerHTML=bookings.length?
+bookings.map(b=>`<div class="card">
+<h3>${b.name}</h3><p>📅 ${b.date} - ${b.time}</p>
+<p>الحالة: <span class="badge">${b.status}</span></p>
+</div>`).join(""):"<p>لا توجد حجوزات حالياً</p>";
+
+document.getElementById("ownerList").innerHTML=bookings.length?
+bookings.map(b=>`<div class="card">
+<h3>${b.name}</h3><p>${b.date} - ${b.time}</p>
+<p>الحالة: ${b.status}</p>
+<button class="btn" onclick="changeStatus(${b.id},'مقبول')">قبول</button>
+<button class="btn danger" onclick="changeStatus(${b.id},'مرفوض')">رفض</button>
+</div>`).join(""):"<p>لا توجد طلبات</p>";
+
+document.getElementById("playerList").innerHTML=players.map(p=>`<p>👤 ${p}</p>`).join("");
+document.getElementById("resultList").innerHTML=results.map(r=>`<p>${r.a} ${r.sa} - ${r.sb} ${r.b}</p>`).join("");
+}
+
+function bookPitch(id){
+let p=pitches.find(x=>x.id===id);
+let date=prompt("أدخل تاريخ الحجز مثال 2026-12-01");
+if(!date)return;
+let time=prompt("أدخل وقت الحجز مثال 7:00 مساءً");
+if(!time)return;
+bookings.push({id:Date.now(),name:p.name,date,time,status:"بانتظار التأكيد"});
+save();render();
+alert("تم إرسال طلب الحجز بنجاح");
+}
+
+function changeStatus(id,status){
+let b=bookings.find(x=>x.id===id);
+if(b){b.status=status;save();render();}
+}
+
+function addPlayer(){
+let n=document.getElementById("playerName").value.trim();
+if(!n)return;
+players.push(n);save();render();
+document.getElementById("playerName").value="";
+}
+
+function addResult(){
+let a=document.getElementById("team1").value.trim();
+let b=document.getElementById("team2").value.trim();
+let sa=document.getElementById("score1").value;
+let sb=document.getElementById("score2").value;
+if(!a||!b||sa===""||sb==="")return alert("أكمل معلومات المباراة");
+results.push({a,b,sa,sb});save();render();
+}
+
+render();
+</script>
 </body>
 </html>
