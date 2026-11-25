@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#07140f">
 <title>ملعبنا | MAL3AB</title>
-
+<link rel="manifest" href="/football-app/manifest.json">
+<link rel="apple-touch-icon" href="/football-app/icon-192.png">
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Tahoma,Arial;background:#07140f;color:#f4fff8}
@@ -40,86 +42,72 @@ footer{text-align:center;padding:25px;color:#89a895}
 .time-grid button:hover{background:#22a45a}
 @media(max-width:420px){.time-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
-<link rel="manifest" href="/football-app/manifest.json">
 </head>
-
 <body>
-
 <header>
-<h1>⚽ ملعبنا MAL3AB</h1>
-<p>احجز ملعبك بسهولة في كربلاء</p>
-<div id="accountArea" style="margin-top:12px">
-<button onclick="showSection('login')">تسجيل الدخول</button>
-</div>
+  <h1>⚽ ملعبنا MAL3AB</h1>
+  <p>احجز ملعبك بسهولة في كربلاء</p>
+  <div id="accountArea" style="margin-top:12px">
+    <button onclick="showSection('login')">تسجيل الدخول</button>
+    <button onclick="showSection('signup')">إنشاء حساب</button>
+  </div>
 </header>
-
 <nav>
-<button onclick="showSection('pitches')">الملاعب</button>
-<button onclick="showSection('bookings')">الحجوزات</button>
-<button onclick="showSection('matches')">المباريات</button>
-<button onclick="showSection('players')">اللاعبون</button>
-<button onclick="showSection('results')">النتائج</button>
-<button onclick="showSection('dashboard')">لوحة الإدارة</button>
+  <button onclick="showSection('pitches')">الملاعب</button>
+  <button onclick="showSection('bookings')">حجوزاتي</button>
+  <button onclick="showSection('matches')">المباريات</button>
+  <button onclick="showSection('players')">اللاعبون</button>
+  <button onclick="showSection('results')">النتائج</button>
+  <button onclick="showSection('dashboard')">لوحة الإدارة</button>
 </nav>
-
 <main>
-<div id="message"></div><section id="pitches" class="section active">
-<h2>الملاعب المتاحة</h2>
-<div id="pitchList" class="grid">
-<p>جاري تحميل الملاعب...</p>
-</div>
-</section>
-
-<section id="bookings" class="section">
-<h2>الحجوزات</h2>
-<div id="bookingList" class="grid">
-<p class="muted">سجّل الدخول لعرض الحجوزات.</p>
-</div>
-</section>
-
-<section id="login" class="section">
-<h2>تسجيل الدخول</h2>
-<div class="form">
-<label>البريد الإلكتروني</label>
-<input id="email" type="email" placeholder="example@gmail.com">
-
-<label>كلمة المرور</label>
-<input id="password" type="password" placeholder="كلمة المرور">
-
-<button class="primary" onclick="login()">دخول</button>
-<button onclick="logout()">تسجيل الخروج</button>
-</div>
-</section>
-
-<section id="dashboard" class="section">
-<h2>لوحة الإدارة</h2>
-<p id="accountInfo" class="muted">سجّل الدخول أولاً.</p>
-<div id="dashboardBookings" class="grid"></div>
-</section>
-
-<section id="matches" class="section">
-<h2>المباريات</h2>
-<p class="muted">قسم المباريات قيد التجهيز.</p>
-</section>
-
-<section id="players" class="section">
-<h2>اللاعبون</h2>
-<p class="muted">قسم اللاعبين قيد التجهيز.</p>
-</section>
-
-<section id="results" class="section">
-<h2>النتائج</h2>
-<p class="muted">قسم النتائج قيد التجهيز.</p>
-</section>
-
+  <div id="message" role="status"></div>
+  <section id="pitches" class="section active">
+    <h2>الملاعب المتاحة</h2>
+    <div id="pitchList" class="grid"><p>جاري تحميل الملاعب...</p></div>
+  </section>
+  <section id="bookings" class="section">
+    <h2>حجوزاتي</h2>
+    <div id="bookingList" class="grid"><p class="muted">جاري التحميل...</p></div>
+  </section>
+  <section id="login" class="section">
+    <h2>تسجيل الدخول</h2>
+    <div class="form">
+      <label for="loginEmail">البريد الإلكتروني</label>
+      <input id="loginEmail" type="email" autocomplete="email" placeholder="example@gmail.com">
+      <label for="loginPassword">كلمة المرور</label>
+      <input id="loginPassword" type="password" autocomplete="current-password" placeholder="كلمة المرور">
+      <button class="primary" onclick="login()">دخول</button>
+      <button onclick="showSection('signup')">إنشاء حساب جديد</button>
+    </div>
+  </section>
+  <section id="signup" class="section">
+    <h2>إنشاء حساب زبون</h2>
+    <div class="form">
+      <label for="signupEmail">البريد الإلكتروني</label>
+      <input id="signupEmail" type="email" autocomplete="email" placeholder="example@gmail.com">
+      <label for="signupPassword">كلمة المرور</label>
+      <input id="signupPassword" type="password" autocomplete="new-password" placeholder="6 أحرف على الأقل">
+      <button class="primary" onclick="signUp()">إنشاء الحساب</button>
+      <button onclick="showSection('login')">لدي حساب بالفعل</button>
+    </div>
+  </section>
+  <section id="dashboard" class="section">
+    <h2>لوحة الإدارة</h2>
+    <p id="accountInfo" class="muted">سجّل الدخول أولاً.</p>
+    <div id="dashboardBookings" class="grid"></div>
+  </section>
+  <section id="matches" class="section"><h2>المباريات</h2><p class="muted">قسم المباريات قيد التجهيز.</p></section>
+  <section id="players" class="section"><h2>اللاعبون</h2><p class="muted">قسم اللاعبين قيد التجهيز.</p></section>
+  <section id="results" class="section"><h2>النتائج</h2><p class="muted">قسم النتائج قيد التجهيز.</p></section>
 </main>
-
 <footer>ملعبنا MAL3AB ©️ 2026</footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>const SUPABASE_URL = "https://ixlgfdtwztfjbbtecspc.supabase.co";
-const SUPABASE_KEY = "sb_publishable_Ot3zAIptj_YYbs7F4pHZww_zl1BQHcy";
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
+"use strict";
 
+const SUPABASE_URL = "https://ixlgfdtwztfjbbtecspc.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Ot3zAIptj_YYbs7F4pHZww_zl1BQHcy";
 const ADMIN_EMAIL = "malabteem@gmail.com";
 
 const supabaseClient = window.supabase.createClient(
@@ -132,23 +120,55 @@ let accountRole = null;
 let ownerPitchId = null;
 let pitches = [];
 
+function showMessage(message) {
+  document.getElementById("message").textContent = message || "";
+}
+
 function showSection(id) {
   document.querySelectorAll(".section").forEach(section => {
     section.classList.remove("active");
   });
 
-  document.getElementById(id).classList.add("active");
+  const section = document.getElementById(id);
+  if (!section) return;
+
+  section.classList.add("active");
+  showMessage("");
 
   if (id === "bookings") loadBookings();
   if (id === "dashboard") loadDashboard();
 }
 
-function showMessage(message) {
-  document.getElementById("message").textContent = message;
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  })[char]);
 }
 
 function formatPrice(price) {
-  return Number(price).toLocaleString("en-US") + " د.ع";
+  return Number(price || 0).toLocaleString("en-US") + " د.ع";
+}
+
+function updateAccountArea() {
+  const area = document.getElementById("accountArea");
+
+  if (!currentUser) {
+    area.innerHTML = `
+      <button onclick="showSection('login')">تسجيل الدخول</button>
+      <button onclick="showSection('signup')">إنشاء حساب</button>
+    `;
+    return;
+  }
+
+  area.innerHTML = `
+    <span>مرحباً ${escapeHTML(currentUser.email || "مستخدم")}</span>
+    <button onclick="showSection('bookings')">حجوزاتي</button>
+    <button onclick="logout()">تسجيل الخروج</button>
+  `;
 }
 
 async function loadPitches() {
@@ -156,18 +176,18 @@ async function loadPitches() {
 
   const { data, error } = await supabaseClient
     .from("pitches")
-    .select("*")
+    .select("id,name,location,price")
     .order("id");
 
   if (error) {
+    console.error("loadPitches:", error);
     container.innerHTML = "<p>تعذر تحميل الملاعب.</p>";
-    console.error(error);
     return;
   }
 
   pitches = data || [];
 
-  if (pitches.length === 0) {
+  if (!pitches.length) {
     container.innerHTML = "<p>لا توجد ملاعب حالياً.</p>";
     return;
   }
@@ -184,20 +204,21 @@ async function loadPitches() {
   `).join("");
 }
 
-function escapeHTML(value) {
-  return String(value ?? "").replace(/[&<>"']/g, char => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;"
-  })[char]);
-}
-
 function bookPitch(pitchId) {
-  const pitch = pitches.find(item => Number(item.id) === Number(pitchId));
+  const pitch = pitches.find(
+    item => Number(item.id) === Number(pitchId)
+  );
 
-  if (!pitch) return;
+  if (!pitch) {
+    showMessage("لم يتم العثور على الملعب.");
+    return;
+  }
+
+  if (!currentUser) {
+    showMessage("سجّل الدخول أولاً حتى نربط الحجز بحسابك.");
+    showSection("login");
+    return;
+  }
 
   const overlay = document.createElement("div");
   overlay.className = "time-overlay";
@@ -217,13 +238,14 @@ function bookPitch(pitchId) {
   overlay.appendChild(box);
   document.body.appendChild(overlay);
 
-  const daysGrid = box.querySelector("#daysGrid");
   const dayNames = [
     "الأحد", "الاثنين", "الثلاثاء",
     "الأربعاء", "الخميس", "الجمعة", "السبت"
   ];
 
-  for (let i = 0; i < 7; i++) {
+  const daysGrid = box.querySelector("#daysGrid");
+
+  for (let i = 0; i < 14; i++) {
     const date = new Date();
     date.setDate(date.getDate() + i);
 
@@ -234,6 +256,7 @@ function bookPitch(pitchId) {
     ].join("-");
 
     const button = document.createElement("button");
+
     button.innerHTML = `
       <strong>${dayNames[date.getDay()]}</strong><br>
       ${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}
@@ -241,25 +264,45 @@ function bookPitch(pitchId) {
 
     button.onclick = () => {
       overlay.remove();
-
-      const name = prompt("اكتب اسمك الكامل:");
-      if (!name || !name.trim()) return;
-
-      const phone = prompt("اكتب رقم هاتفك:");
-      if (!phone || !phone.trim()) return;
-
-      openTimePicker(
-        pitch,
-        name.trim(),
-        phone.trim(),
-        dateValue
-      );
+      openBookingDetails(pitch, dateValue);
     };
 
     daysGrid.appendChild(button);
   }
+}function openBookingDetails(pitch, date) {
+  const overlay = document.createElement("div");
+  overlay.className = "time-overlay";
+
+  const box = document.createElement("div");
+  box.className = "time-box";
+
+  box.innerHTML = `
+    <h2>بيانات الحجز</h2>
+    <p>${escapeHTML(pitch.name)} — ${escapeHTML(date)}</p>
+    <label>الاسم الكامل</label>
+    <input id="customerName" maxlength="100" placeholder="اكتب اسمك">
+    <label>رقم الهاتف</label>
+    <input id="customerPhone" type="tel" maxlength="30" placeholder="07xxxxxxxxx">
+    <button class="primary" id="continueBooking">اختيار الوقت</button>
+    <button onclick="this.closest('.time-overlay').remove()">إغلاق</button>
+  `;
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  box.querySelector("#continueBooking").onclick = () => {
+    const name = box.querySelector("#customerName").value.trim();
+    const phone = box.querySelector("#customerPhone").value.trim();
+
+    if (!name || !phone) {
+      showMessage("اكتب الاسم ورقم الهاتف.");
+      return;
+    }
+
+    overlay.remove();
+    openTimePicker(pitch, name, phone, date);
+  };
 }
-  const pitch = pitches.find(item => Number(item.id) === Number(pitchId));
 
 function openTimePicker(pitch, name, phone, date) {
   const overlay = document.createElement("div");
@@ -282,14 +325,11 @@ function openTimePicker(pitch, name, phone, date) {
 
   const grid = box.querySelector("#timeGrid");
 
-  for (let hour = 7; hour <= 25; hour++) {
-    for (let minute of [0, 30]) {
-      if (hour === 25 && minute === 30) continue;
-
-      const normalizedHour = hour % 24;
-      const period = normalizedHour >= 12 ? "مساءً" : "صباحاً";
-      const displayHour = normalizedHour % 12 || 12;
-      const time = `${String(normalizedHour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+  for (let hour = 7; hour <= 23; hour++) {
+    for (const minute of [0, 30]) {
+      const time = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+      const displayHour = hour % 12 || 12;
+      const period = hour >= 12 ? "مساءً" : "صباحاً";
 
       const button = document.createElement("button");
       button.textContent = `${displayHour}:${String(minute).padStart(2, "0")} ${period}`;
@@ -302,12 +342,20 @@ function openTimePicker(pitch, name, phone, date) {
       grid.appendChild(button);
     }
   }
-}async function saveBooking(pitch, name, phone, date, time) {
+}
+
+async function saveBooking(pitch, name, phone, date, time) {
+  if (!currentUser) {
+    showMessage("انتهت جلسة الدخول. سجّل الدخول من جديد.");
+    return;
+  }
+
   showMessage("جاري إرسال طلب الحجز...");
 
   const { error } = await supabaseClient
     .from("bookings")
     .insert({
+      user_id: currentUser.id,
       customer_name: name,
       phone: phone,
       pitch_id: pitch.id,
@@ -317,22 +365,25 @@ function openTimePicker(pitch, name, phone, date) {
     });
 
   if (error) {
-    console.error(error);
+    console.error("saveBooking:", error);
     showMessage("فشل الحجز: " + error.message);
     return;
   }
 
-  showMessage("تم إرسال طلب الحجز بنجاح، بانتظار موافقة الإدارة.");
+  showMessage("تم إرسال طلب الحجز بنجاح. تابع حالته من حجوزاتي.");
+  await loadBookings();
 }
 
 async function login() {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
 
   if (!email || !password) {
     showMessage("اكتب البريد الإلكتروني وكلمة المرور.");
     return;
   }
+
+  showMessage("جاري تسجيل الدخول...");
 
   const { data, error } = await supabaseClient.auth.signInWithPassword({
     email,
@@ -346,15 +397,53 @@ async function login() {
 
   currentUser = data.user;
   await setAccount();
+  updateAccountArea();
+
   showMessage("تم تسجيل الدخول بنجاح.");
-  showSection("dashboard");
+  showSection("pitches");
 }
 
-async function logout() {
+async function signUp() {
+  const email = document.getElementById("signupEmail").value.trim();
+  const password = document.getElementById("signupPassword").value;
+
+  if (!email || !password) {
+    showMessage("اكتب البريد الإلكتروني وكلمة المرور.");
+    return;
+  }
+
+  if (password.length < 6) {
+    showMessage("كلمة المرور لازم تكون 6 أحرف على الأقل.");
+    return;
+  }
+
+  showMessage("جاري إنشاء الحساب...");
+
+  const { data, error } = await supabaseClient.auth.signUp({
+    email,
+    password
+  });
+
+  if (error) {
+    showMessage("فشل إنشاء الحساب: " + error.message);
+    return;
+  }
+
+  if (data.session && data.user) {
+    currentUser = data.user;
+    await setAccount();
+    updateAccountArea();
+    showMessage("تم إنشاء الحساب وتسجيل الدخول بنجاح.");
+    showSection("pitches");
+  } else {
+    showMessage("تم إنشاء الحساب. أكّد بريدك الإلكتروني ثم سجّل الدخول.");
+    showSection("login");
+  }
+}async function logout() {
   const { error } = await supabaseClient.auth.signOut();
 
   if (error) {
-    showMessage(error.message);
+    showMessage("تعذر تسجيل الخروج: " + error.message);
     return;
   }
 
@@ -362,8 +451,7 @@ async function logout() {
   accountRole = null;
   ownerPitchId = null;
 
-  document.getElementById("accountArea").innerHTML =
-    '<button onclick="showSection(\'login\')">تسجيل الدخول</button>';
+  updateAccountArea();
 
   document.getElementById("accountInfo").textContent =
     "سجّل الدخول أولاً.";
@@ -373,7 +461,11 @@ async function logout() {
 }
 
 async function setAccount() {
-  if (!currentUser) return;
+  if (!currentUser) {
+    accountRole = null;
+    ownerPitchId = null;
+    return;
+  }
 
   const email = (currentUser.email || "").toLowerCase();
 
@@ -383,60 +475,60 @@ async function setAccount() {
   } else {
     const { data, error } = await supabaseClient
       .from("owner_profiles")
-      .select("pitch_id, role")
+      .select("pitch_id,role")
       .eq("user_id", currentUser.id)
       .maybeSingle();
 
     if (error) {
-      console.error(error);
+      console.error("setAccount:", error);
+      accountRole = null;
+      ownerPitchId = null;
       showMessage("تعذر تحميل صلاحيات الحساب: " + error.message);
       return;
     }
 
-    accountRole = data?.role || null;
-    ownerPitchId = data?.pitch_id || null;
+    if (data && data.role === "owner") {
+      accountRole = "owner";
+      ownerPitchId = data.pitch_id;
+    } else {
+      accountRole = "customer";
+      ownerPitchId = null;
+    }
   }
-
-  document.getElementById("accountArea").innerHTML = `
-    <span>مرحباً ${escapeHTML(email)}</span>
-    <button onclick="logout()">تسجيل الخروج</button>
-  `;
 
   document.getElementById("accountInfo").textContent =
     accountRole === "admin"
       ? "أنت مسجل دخول كمدير الموقع."
       : accountRole === "owner"
         ? "أنت مسجل دخول كصاحب ملعب."
-        : "حسابك لا يملك صلاحية الإدارة.";
+        : "أنت مسجل دخول كزبون.";
 }
 
 async function loadBookings() {
   const container = document.getElementById("bookingList");
 
-  if (!currentUser || !accountRole) {
-    container.innerHTML = "<p>سجّل الدخول أولاً.</p>";
-    return;
-  }
-
-  if (accountRole !== "admin" && accountRole !== "owner") {
-    container.innerHTML = "<p>ليس لديك صلاحية عرض الحجوزات.</p>";
+  if (!currentUser) {
+    container.innerHTML = "<p>سجّل الدخول أولاً لعرض حجوزاتك.</p>";
     return;
   }
 
   let query = supabaseClient
     .from("bookings")
-    .select("id, customer_name, phone, pitch_id, booking_date, booking_time, status, pitches(name)")
+    .select("id,customer_name,phone,pitch_id,booking_date,booking_time,status,pitches(name)")
     .order("created_at", { ascending: false });
 
   if (accountRole === "owner") {
     query = query.eq("pitch_id", ownerPitchId);
+  } else if (accountRole === "customer") {
+    query = query.eq("user_id", currentUser.id);
   }
 
   const { data, error } = await query;
 
   if (error) {
-    container.innerHTML = "<p>تعذر تحميل الحجوزات: " +
-      escapeHTML(error.message) + "</p>";
+    console.error("loadBookings:", error);
+    container.innerHTML =
+      "<p>تعذر تحميل الحجوزات: " + escapeHTML(error.message) + "</p>";
     return;
   }
 
@@ -446,19 +538,19 @@ async function loadBookings() {
 async function loadDashboard() {
   const container = document.getElementById("dashboardBookings");
 
-  if (!currentUser || !accountRole) {
+  if (!currentUser) {
     container.innerHTML = "<p>سجّل الدخول أولاً.</p>";
     return;
   }
 
-  if (accountRole !== "admin" && accountRole !== "owner") {
-    container.innerHTML = "<p>ليس لديك صلاحية الإدارة.</p>";
+  if (!["admin", "owner"].includes(accountRole)) {
+    container.innerHTML = "<p>هذه اللوحة مخصصة للإدارة وأصحاب الملاعب.</p>";
     return;
   }
 
   let query = supabaseClient
     .from("bookings")
-    .select("id, customer_name, phone, pitch_id, booking_date, booking_time, status, pitches(name)")
+    .select("id,customer_name,phone,pitch_id,booking_date,booking_time,status,pitches(name)")
     .order("created_at", { ascending: false });
 
   if (accountRole === "owner") {
@@ -468,8 +560,9 @@ async function loadDashboard() {
   const { data, error } = await query;
 
   if (error) {
-    container.innerHTML = "<p>تعذر تحميل البيانات: " +
-      escapeHTML(error.message) + "</p>";
+    console.error("loadDashboard:", error);
+    container.innerHTML =
+      "<p>تعذر تحميل البيانات: " + escapeHTML(error.message) + "</p>";
     return;
   }
 
@@ -491,15 +584,20 @@ function renderBookings(container, bookings) {
       <p>الوقت: ${escapeHTML(booking.booking_time)}</p>
       <p class="status">الحالة: ${escapeHTML(booking.status)}</p>
 
-      <button class="primary"
-        onclick="changeBooking(${Number(booking.id)}, 'approved')">
-        قبول
-      </button>
-
-      <button class="danger"
-        onclick="changeBooking(${Number(booking.id)}, 'rejected')">
-        رفض
-      </button>
+      ${
+        ["admin", "owner"].includes(accountRole)
+          ? `
+            <button class="primary"
+              onclick="changeBooking(${Number(booking.id)}, 'approved')">
+              قبول
+            </button>
+            <button class="danger"
+              onclick="changeBooking(${Number(booking.id)}, 'rejected')">
+              رفض
+            </button>
+          `
+          : ""
+      }
     </div>
   `).join("");
 }
@@ -510,14 +608,20 @@ async function changeBooking(id, status) {
     return;
   }
 
-  const { error } = await supabaseClient
+  let query = supabaseClient
     .from("bookings")
     .update({ status })
     .eq("id", id);
 
+  if (accountRole === "owner") {
+    query = query.eq("pitch_id", ownerPitchId);
+  }
+
+  const { error } = await query;
+
   if (error) {
+    console.error("changeBooking:", error);
     showMessage("تعذر تحديث الحجز: " + error.message);
-    console.error(error);
     return;
   }
 
@@ -527,25 +631,35 @@ async function changeBooking(id, status) {
 }
 
 async function initializeApp() {
-  const { data } = await supabaseClient.auth.getSession();
+  const { data, error } = await supabaseClient.auth.getSession();
 
-  currentUser = data.session?.user || null;
+  if (error) {
+    showMessage("تعذر استعادة جلسة الدخول.");
+    console.error(error);
+  }
+
+  currentUser = data?.session?.user || null;
 
   if (currentUser) {
     await setAccount();
   }
 
+  updateAccountArea();
   await loadPitches();
 
   supabaseClient.auth.onAuthStateChange((_event, session) => {
     currentUser = session?.user || null;
 
     setTimeout(async () => {
-      if (currentUser) {
-        await setAccount();
-      } else {
-        accountRole = null;
-        ownerPitchId = null;
+      await setAccount();
+      updateAccountArea();
+
+      if (document.getElementById("bookings").classList.contains("active")) {
+        await loadBookings();
+      }
+
+      if (document.getElementById("dashboard").classList.contains("active")) {
+        await loadDashboard();
       }
     }, 0);
   });
@@ -553,7 +667,15 @@ async function initializeApp() {
 
 initializeApp();
 </script>
-<link rel="manifest" href="/football-app/manifest.json">
-</head><link rel="apple-touch-icon" href="/football-app/icon-192.png">
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/football-app/sw.js")
+      .catch(error => console.error("Service Worker:", error));
+  });
+}
+</script>
+
 </body>
 </html>
