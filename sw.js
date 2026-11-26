@@ -36,4 +36,29 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     fetch(event.request).catch(() => caches.match(event.request))
   );
+});self.addEventListener("push", (event) => {
+  let data = {};
+
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch {
+    data = { body: event.data ? event.data.text() : "" };
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(data.title || "MAL3AB", {
+      body: data.body || "عندك إشعار جديد",
+      icon: "/football-app/icon-192.png",
+      badge: "/football-app/icon-192.png",
+      data: { url: data.url || "/football-app/" }
+    })
+  );
+});
+
+
+
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  event.waitUntil(clients.openWindow(event.notification.data?.url || "/football-app/"));
 });

@@ -115,6 +115,62 @@ const supabaseClient = window.supabase.createClient(
   SUPABASE_KEY
 );
 
+const VAPID_PUBLIC_KEY = "BKdSAoVQwe_ll1YrDL8hIexBDfPV42VezGIgKABJ2K7fFntxOhHUIJ_Aoy4FPMBSSz0yU1Yibtsdu2TR-NT1t6c";
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
+  const rawData = atob(base64);
+  return Uint8Array.from(rawData, (char) => char.charCodeAt(0));
+}
+
+async function enablePushNotifications() {
+  if (!currentUser) {
+    alert("سجّل دخولك أولاً");
+    return;
+  }
+
+  if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+    alert("الإشعارات غير مدعومة بهذا المتصفح");
+    return;
+  }
+
+  const permission = await Notification.requestPermission();
+
+  if (permission !== "granted") {
+    alert("لازم تسمح بالإشعارات");
+    return;
+  }
+
+  const registration = await navigator.serviceWorker.ready;
+
+  let subscription = await registration.pushManager.getSubscription();
+
+  if (!subscription) {
+    subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+    });
+  }
+
+  const keys = subscription.toJSON().keys;
+
+  const { error } = await supabaseClient
+    .from("push_subscriptions")
+    .upsert({
+      user_id: currentUser.id,
+      endpoint: subscription.endpoint,
+      p256dh: keys.p256dh,
+      auth: keys.auth
+    }, { onConflict: "endpoint" });
+
+  if (error) throw error;
+
+  alert("تم تفعيل الإشعارات بنجاح");
+}
+
 let currentUser = null;
 let accountRole = null;
 let ownerPitchId = null;
@@ -165,10 +221,11 @@ function updateAccountArea() {
   }
 
   area.innerHTML = `
-    <span>مرحباً ${escapeHTML(currentUser.email || "مستخدم")}</span>
-    <button onclick="showSection('bookings')">حجوزاتي</button>
-    <button onclick="logout()">تسجيل الخروج</button>
-  `;
+  <span>مرحباً ${escapeHTML(currentUser.email || "مستخدم")}</span>
+  <button onclick="enableNotifications()">🔔 تفعيل الإشعارات</button>
+  <button onclick="showSection('bookings')">حجوزاتي</button>
+  <button onclick="logout()">تسجيل الخروج</button>
+`;
 }
 
 async function loadPitches() {
@@ -665,6 +722,66 @@ async function initializeApp() {
   });
 }
 
+const VAPID_PUBLIC_KEY = "ضع_المفتاح_العام_الجديد_هنا";
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
+
+  const raw = atob(base64);
+  return Uint8Array.from(raw, (char) => char.charCodeAt(0));
+}
+
+async function enableNotifications() {
+  try {
+    if (!currentUser) {
+      alert("سجّل دخولك أولاً");
+      return;
+    }
+
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+      alert("هذا المتصفح لا يدعم الإشعارات");
+      return;
+    }
+
+    const registration = await navigator.serviceWorker.ready;
+    const permission = await Notification.requestPermission();
+
+    if (permission !== "granted") {
+      alert("لم يتم السماح بالإشعارات");
+      return;
+    }
+
+    let subscription = await registration.pushManager.getSubscription();
+
+    if (!subscription) {
+      subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+      });
+    }
+
+    const data = subscription.toJSON();
+
+    const { error } = await supabaseClient
+      .from("push_subscriptions")
+      .upsert({
+        user_id: currentUser.id,
+        endpoint: data.endpoint,
+        p256dh: data.keys.p256dh,
+        auth: data.keys.auth
+      }, { onConflict: "endpoint" });
+
+    if (error) throw error;
+
+    alert("تم تفعيل الإشعارات بنجاح");
+  } catch (error) {
+    console.error(error);
+    alert("تعذر تفعيل الإشعارات: " + error.message);
+  }
+}
 initializeApp();
 </script>
 
