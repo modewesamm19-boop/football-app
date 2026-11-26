@@ -660,11 +660,11 @@ function renderBookings(container, bookings) {
         ["admin", "owner"].includes(accountRole)
           ? `
             <button class="primary"
-              onclick="changeBooking(${Number(booking.id)}, 'approved')">
+             onclick="changeBooking('${booking.id}', 'approved')"
               قبول
             </button>
             <button class="danger"
-              onclick="changeBooking(${Number(booking.id)}, 'rejected')">
+              onclick="changeBooking('${booking.id}', 'rejected')"
               رفض
             </button>
           `
