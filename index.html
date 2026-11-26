@@ -7,6 +7,7 @@
 <title>ملعبنا | MAL3AB</title>
 <link rel="manifest" href="/football-app/manifest.json">
 <link rel="apple-touch-icon" href="/football-app/icon-192.png">
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Tahoma,Arial;background:#07140f;color:#f4fff8}
@@ -34,15 +35,45 @@ label{display:block;color:#cce6d3}
 .muted{color:#b7c9bc}
 #message{margin:12px 0;color:#ffd36a;white-space:pre-wrap}
 footer{text-align:center;padding:25px;color:#89a895}
+
 .time-overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;z-index:9999;padding:15px}
 .time-box{background:#10271c;border:1px solid #28543b;border-radius:16px;padding:20px;width:100%;max-width:520px;max-height:85vh;overflow-y:auto}
 .time-box h2{margin-top:0}
 .time-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
 .time-grid button{background:#1c4930;padding:13px 5px;border:1px solid #345d43}
 .time-grid button:hover{background:#22a45a}
-@media(max-width:420px){.time-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* أزرار قبول ورفض الحجوزات */
+.booking-actions{
+  display:flex;
+  gap:10px;
+  margin-top:16px;
+}
+.booking-action{
+  flex:1;
+  min-width:90px;
+  padding:12px 16px;
+  border-radius:10px;
+  font-size:15px;
+  font-weight:bold;
+}
+.booking-action.approve{
+  background:#16a34a;
+  color:white;
+}
+.booking-action.reject{
+  background:#dc2626;
+  color:white;
+}
+.booking-action.approve:hover{background:#15803d}
+.booking-action.reject:hover{background:#b91c1c}
+
+@media(max-width:420px){
+  .time-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 </style>
 </head>
+
 <body>
 <header>
   <h1>⚽ ملعبنا MAL3AB</h1>
@@ -52,6 +83,7 @@ footer{text-align:center;padding:25px;color:#89a895}
     <button onclick="showSection('signup')">إنشاء حساب</button>
   </div>
 </header>
+
 <nav>
   <button onclick="showSection('pitches')">الملاعب</button>
   <button onclick="showSection('bookings')">حجوزاتي</button>
@@ -60,16 +92,20 @@ footer{text-align:center;padding:25px;color:#89a895}
   <button onclick="showSection('results')">النتائج</button>
   <button onclick="showSection('dashboard')">لوحة الإدارة</button>
 </nav>
+
 <main>
   <div id="message" role="status"></div>
+
   <section id="pitches" class="section active">
     <h2>الملاعب المتاحة</h2>
     <div id="pitchList" class="grid"><p>جاري تحميل الملاعب...</p></div>
   </section>
+
   <section id="bookings" class="section">
     <h2>حجوزاتي</h2>
     <div id="bookingList" class="grid"><p class="muted">جاري التحميل...</p></div>
   </section>
+
   <section id="login" class="section">
     <h2>تسجيل الدخول</h2>
     <div class="form">
@@ -81,6 +117,7 @@ footer{text-align:center;padding:25px;color:#89a895}
       <button onclick="showSection('signup')">إنشاء حساب جديد</button>
     </div>
   </section>
+
   <section id="signup" class="section">
     <h2>إنشاء حساب زبون</h2>
     <div class="form">
@@ -92,18 +129,34 @@ footer{text-align:center;padding:25px;color:#89a895}
       <button onclick="showSection('login')">لدي حساب بالفعل</button>
     </div>
   </section>
+
   <section id="dashboard" class="section">
     <h2>لوحة الإدارة</h2>
     <p id="accountInfo" class="muted">سجّل الدخول أولاً.</p>
     <div id="dashboardBookings" class="grid"></div>
   </section>
-  <section id="matches" class="section"><h2>المباريات</h2><p class="muted">قسم المباريات قيد التجهيز.</p></section>
-  <section id="players" class="section"><h2>اللاعبون</h2><p class="muted">قسم اللاعبين قيد التجهيز.</p></section>
-  <section id="results" class="section"><h2>النتائج</h2><p class="muted">قسم النتائج قيد التجهيز.</p></section>
+
+  <section id="matches" class="section">
+    <h2>المباريات</h2>
+    <p class="muted">قسم المباريات قيد التجهيز.</p>
+  </section>
+
+  <section id="players" class="section">
+    <h2>اللاعبون</h2>
+    <p class="muted">قسم اللاعبين قيد التجهيز.</p>
+  </section>
+
+  <section id="results" class="section">
+    <h2>النتائج</h2>
+    <p class="muted">قسم النتائج قيد التجهيز.</p>
+  </section>
 </main>
+
 <footer>ملعبنا MAL3AB ©️ 2026</footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
 "use strict";
 
 const SUPABASE_URL = "https://ixlgfdtwztfjbbtecspc.supabase.co";
@@ -116,60 +169,6 @@ const supabaseClient = window.supabase.createClient(
 );
 
 const VAPID_PUBLIC_KEY = "BKdSAoVQwe_ll1YrDL8hIexBDfPV42VezGIgKABJ2K7fFntxOhHUIJ_Aoy4FPMBSSz0yU1Yibtsdu2TR-NT1t6c";
-
-function urlBase64ToUint8Array(base64String) {
-  const padding = "=".repeat((4 - base64String.length % 4) % 4);
-  const base64 = (base64String + padding)
-    .replace(/-/g, "+")
-    .replace(/_/g, "/");
-  const rawData = atob(base64);
-  return Uint8Array.from(rawData, (char) => char.charCodeAt(0));
-}
-
-async function enablePushNotifications() {
-  if (!currentUser) {
-    alert("سجّل دخولك أولاً");
-    return;
-  }
-
-  if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
-    alert("الإشعارات غير مدعومة بهذا المتصفح");
-    return;
-  }
-
-  const permission = await Notification.requestPermission();
-
-  if (permission !== "granted") {
-    alert("لازم تسمح بالإشعارات");
-    return;
-  }
-
-  const registration = await navigator.serviceWorker.ready;
-
-  let subscription = await registration.pushManager.getSubscription();
-
-  if (!subscription) {
-    subscription = await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-    });
-  }
-
-  const keys = subscription.toJSON().keys;
-
-  const { error } = await supabaseClient
-    .from("push_subscriptions")
-    .upsert({
-      user_id: currentUser.id,
-      endpoint: subscription.endpoint,
-      p256dh: keys.p256dh,
-      auth: keys.auth
-    }, { onConflict: "endpoint" });
-
-  if (error) throw error;
-
-  alert("تم تفعيل الإشعارات بنجاح");
-}
 
 let currentUser = null;
 let accountRole = null;
@@ -221,11 +220,11 @@ function updateAccountArea() {
   }
 
   area.innerHTML = `
-  <span>مرحباً ${escapeHTML(currentUser.email || "مستخدم")}</span>
-  <button onclick="enableNotifications()">🔔 تفعيل الإشعارات</button>
-  <button onclick="showSection('bookings')">حجوزاتي</button>
-  <button onclick="logout()">تسجيل الخروج</button>
-`;
+    <span>مرحباً ${escapeHTML(currentUser.email || "مستخدم")}</span>
+    <button onclick="enableNotifications()">🔔 تفعيل الإشعارات</button>
+    <button onclick="showSection('bookings')">حجوزاتي</button>
+    <button onclick="logout()">تسجيل الخروج</button>
+  `;
 }
 
 async function loadPitches() {
@@ -287,9 +286,7 @@ function bookPitch(pitchId) {
     <h2>اختار يوم الحجز</h2>
     <p>${escapeHTML(pitch.name)}</p>
     <div id="daysGrid" class="grid"></div>
-    <button onclick="this.closest('.time-overlay').remove()">
-      إغلاق
-    </button>
+    <button onclick="this.closest('.time-overlay').remove()">إغلاق</button>
   `;
 
   overlay.appendChild(box);
@@ -326,7 +323,9 @@ function bookPitch(pitchId) {
 
     daysGrid.appendChild(button);
   }
-}function openBookingDetails(pitch, date) {
+}
+
+function openBookingDetails(pitch, date) {
   const overlay = document.createElement("div");
   overlay.className = "time-overlay";
 
@@ -372,9 +371,7 @@ function openTimePicker(pitch, name, phone, date) {
     <h2>اختار وقت الحجز</h2>
     <p class="muted">${escapeHTML(pitch.name)} - ${escapeHTML(date)}</p>
     <div class="time-grid" id="timeGrid"></div>
-    <button style="margin-top:15px" onclick="this.closest('.time-overlay').remove()">
-      إغلاق
-    </button>
+    <button style="margin-top:15px" onclick="this.closest('.time-overlay').remove()">إغلاق</button>
   `;
 
   overlay.appendChild(box);
@@ -420,28 +417,31 @@ async function saveBooking(pitch, name, phone, date, time) {
       booking_time: time,
       status: "pending"
     })
-.select()
-.single();
+    .select()
+    .single();
+
   if (error) {
     console.error("saveBooking:", error);
     showMessage("فشل الحجز: " + error.message);
     return;
   }
-try {
-  const { error: pushError } = await supabaseClient.functions.invoke(
-    "send-push",
-    {
-      body: {
-        booking_id: booking.id,
-        event: "booking_created"
-      }
-    }
-  );
 
-  if (pushError) console.error("Push error:", pushError);
-} catch (e) {
-  console.error("Push failed:", e);
-}
+  try {
+    const { error: pushError } = await supabaseClient.functions.invoke(
+      "send-push",
+      {
+        body: {
+          booking_id: booking.id,
+          event: "booking_created"
+        }
+      }
+    );
+
+    if (pushError) console.error("Push error:", pushError);
+  } catch (e) {
+    console.error("Push failed:", e);
+  }
+
   showMessage("تم إرسال طلب الحجز بنجاح. تابع حالته من حجوزاتي.");
   await loadBookings();
 }
@@ -511,7 +511,9 @@ async function signUp() {
     showMessage("تم إنشاء الحساب. أكّد بريدك الإلكتروني ثم سجّل الدخول.");
     showSection("login");
   }
-}async function logout() {
+}
+
+async function logout() {
   const { error } = await supabaseClient.auth.signOut();
 
   if (error) {
@@ -641,6 +643,7 @@ async function loadDashboard() {
   renderBookings(container, data || []);
 }
 
+/* عرض الحجوزات وأزرار القبول والرفض */
 function renderBookings(container, bookings) {
   if (!bookings.length) {
     container.innerHTML = "<p>لا توجد حجوزات حالياً.</p>";
@@ -657,16 +660,20 @@ function renderBookings(container, bookings) {
       <p class="status">الحالة: ${escapeHTML(booking.status)}</p>
 
       ${
-        ["admin", "owner"].includes(accountRole)
+        ["admin", "owner"].includes(accountRole) &&
+        booking.status === "pending"
           ? `
-            <button class="primary"
-             onclick="changeBooking('${booking.id}', 'approved')"
-              قبول
-            </button>
-            <button class="danger"
-              onclick="changeBooking('${booking.id}', 'rejected')"
-              رفض
-            </button>
+            <div class="booking-actions">
+              <button class="booking-action approve"
+                onclick="changeBooking('${booking.id}', 'approved')">
+                ✓ قبول
+              </button>
+
+              <button class="booking-action reject"
+                onclick="changeBooking('${booking.id}', 'rejected')">
+                ✕ رفض
+              </button>
+            </div>
           `
           : ""
       }
@@ -677,6 +684,10 @@ function renderBookings(container, bookings) {
 async function changeBooking(id, status) {
   if (!currentUser || !["admin", "owner"].includes(accountRole)) {
     showMessage("ليس لديك صلاحية.");
+    return;
+  }
+
+  if (status === "rejected" && !confirm("متأكد تريد رفض هذا الحجز؟")) {
     return;
   }
 
@@ -696,61 +707,29 @@ async function changeBooking(id, status) {
     showMessage("تعذر تحديث الحجز: " + error.message);
     return;
   }
-try {
-  const { error: pushError } = await supabaseClient.functions.invoke(
-    "send-push",
-    {
-      body: {
-        booking_id: id,
-        event: "booking_status"
-      }
-    }
-  );
 
-  if (pushError) console.error("Push error:", pushError);
-} catch (e) {
-  console.error("Push failed:", e);
-}
+  try {
+    const { error: pushError } = await supabaseClient.functions.invoke(
+      "send-push",
+      {
+        body: {
+          booking_id: id,
+          event: "booking_status"
+        }
+      }
+    );
+
+    if (pushError) console.error("Push error:", pushError);
+  } catch (e) {
+    console.error("Push failed:", e);
+  }
+
   showMessage("تم تحديث حالة الحجز.");
   await loadBookings();
   await loadDashboard();
 }
 
-async function initializeApp() {
-  const { data, error } = await supabaseClient.auth.getSession();
-
-  if (error) {
-    showMessage("تعذر استعادة جلسة الدخول.");
-    console.error(error);
-  }
-
-  currentUser = data?.session?.user || null;
-
-  if (currentUser) {
-    await setAccount();
-  }
-
-  updateAccountArea();
-  await loadPitches();
-
-  supabaseClient.auth.onAuthStateChange((_event, session) => {
-    currentUser = session?.user || null;
-
-    setTimeout(async () => {
-      await setAccount();
-      updateAccountArea();
-
-      if (document.getElementById("bookings").classList.contains("active")) {
-        await loadBookings();
-      }
-
-      if (document.getElementById("dashboard").classList.contains("active")) {
-        await loadDashboard();
-      }
-    }, 0);
-  });
-}
-
+/* تحويل مفتاح الإشعارات */
 function urlBase64ToUint8Array(base64String) {
   const padding = "=".repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding)
@@ -758,9 +737,10 @@ function urlBase64ToUint8Array(base64String) {
     .replace(/_/g, "/");
 
   const raw = atob(base64);
-  return Uint8Array.from(raw, (char) => char.charCodeAt(0));
+  return Uint8Array.from(raw, char => char.charCodeAt(0));
 }
 
+/* تفعيل الإشعارات */
 async function enableNotifications() {
   try {
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
@@ -819,6 +799,43 @@ async function enableNotifications() {
     alert("تعذر تفعيل الإشعارات: " + error.message);
   }
 }
+
+/* تشغيل التطبيق */
+async function initializeApp() {
+  const { data, error } = await supabaseClient.auth.getSession();
+
+  if (error) {
+    showMessage("تعذر استعادة جلسة الدخول.");
+    console.error(error);
+  }
+
+  currentUser = data?.session?.user || null;
+
+  if (currentUser) {
+    await setAccount();
+  }
+
+  updateAccountArea();
+  await loadPitches();
+
+  supabaseClient.auth.onAuthStateChange((_event, session) => {
+    currentUser = session?.user || null;
+
+    setTimeout(async () => {
+      await setAccount();
+      updateAccountArea();
+
+      if (document.getElementById("bookings").classList.contains("active")) {
+        await loadBookings();
+      }
+
+      if (document.getElementById("dashboard").classList.contains("active")) {
+        await loadDashboard();
+      }
+    }, 0);
+  });
+}
+
 initializeApp();
 </script>
 
