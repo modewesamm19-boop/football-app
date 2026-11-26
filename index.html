@@ -409,7 +409,7 @@ async function saveBooking(pitch, name, phone, date, time) {
 
   showMessage("جاري إرسال طلب الحجز...");
 
-  const { error } = await supabaseClient
+  const { data: booking, error } = await supabaseClient
     .from("bookings")
     .insert({
       user_id: currentUser.id,
@@ -419,14 +419,29 @@ async function saveBooking(pitch, name, phone, date, time) {
       booking_date: date,
       booking_time: time,
       status: "pending"
-    });
-
+    })
+.select()
+.single();
   if (error) {
     console.error("saveBooking:", error);
     showMessage("فشل الحجز: " + error.message);
     return;
   }
+try {
+  const { error: pushError } = await supabaseClient.functions.invoke(
+    "send-push",
+    {
+      body: {
+        booking_id: booking.id,
+        event: "booking_created"
+      }
+    }
+  );
 
+  if (pushError) console.error("Push error:", pushError);
+} catch (e) {
+  console.error("Push failed:", e);
+}
   showMessage("تم إرسال طلب الحجز بنجاح. تابع حالته من حجوزاتي.");
   await loadBookings();
 }
@@ -681,7 +696,21 @@ async function changeBooking(id, status) {
     showMessage("تعذر تحديث الحجز: " + error.message);
     return;
   }
+try {
+  const { error: pushError } = await supabaseClient.functions.invoke(
+    "send-push",
+    {
+      body: {
+        booking_id: id,
+        event: "booking_status"
+      }
+    }
+  );
 
+  if (pushError) console.error("Push error:", pushError);
+} catch (e) {
+  console.error("Push failed:", e);
+}
   showMessage("تم تحديث حالة الحجز.");
   await loadBookings();
   await loadDashboard();
