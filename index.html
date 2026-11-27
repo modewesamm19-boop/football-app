@@ -411,6 +411,53 @@
       color: white
     }
 
+    .match-form {
+      max-width: 620px;
+      margin-bottom: 20px
+    }
+
+    .match-form h3,
+    .match-card h3 {
+      color: #c7f9d7
+    }
+
+    .match-teams {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+      font-size: 18px;
+      font-weight: 900;
+      text-align: center
+    }
+
+    .match-score {
+      color: var(--aqua);
+      font-size: 24px;
+      font-weight: 900;
+      white-space: nowrap
+    }
+
+    .match-meta {
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    .match-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+      margin-top: 14px;
+      padding-top: 13px;
+      border-top: 1px solid var(--line)
+    }
+
+    .match-controls input,
+    .match-controls select {
+      margin: 0;
+      padding: 9px 10px
+    }
+
     @media(max-width:620px) {
       header {
         padding: 20px 13px
@@ -523,7 +570,9 @@
     </section>
     <section id="matches" class="section">
       <h2>المباريات</h2>
-      <p class="muted">قسم المباريات قيد التجهيز.</p>
+      <p class="muted">مواعيد المباريات وحالتها.</p>
+      <div id="matchAdminForm"></div>
+      <div id="matchList" class="grid"><p class="muted">جاري تحميل المباريات...</p></div>
     </section>
     <section id="players" class="section">
       <h2>⚽ مجتمع اللاعبين</h2>
@@ -574,7 +623,8 @@
     </section>
     <section id="results" class="section">
       <h2>النتائج</h2>
-      <p class="muted">قسم النتائج قيد التجهيز.</p>
+      <p class="muted">المباريات المكتملة ونتائجها.</p>
+      <div id="resultList" class="grid"><p class="muted">جاري تحميل النتائج...</p></div>
     </section>
   </main>
   <footer>ملعبنا MAL3AB © 2026</footer>
@@ -593,6 +643,7 @@ let accountRole = null;
 let ownerPitchId = null;
 let pitches = [];
 let playerProfiles = [];
+let matches = [];
 
 function showMessage(message) {
   document.getElementById("message").textContent = message || "";
@@ -606,6 +657,8 @@ function showSection(id) {
   showMessage("");
   if (id === "bookings") loadBookings();
   if (id === "dashboard") loadDashboard();
+  if (id === "matches") loadMatches();
+  if (id === "results") loadResults();
   if (id === "players") {
     loadPlayers();
     loadPlayerProfile();
@@ -945,6 +998,144 @@ function filterPlayers() {
   container.innerHTML = filtered.map(player => `<article class="card"><h3>⚽ ${escapeHTML(player.display_name)}</h3><p>📍 ${escapeHTML(player.city || "كربلاء")}${player.area ? ` · ${escapeHTML(player.area)}` : ""}</p><p>المركز: ${escapeHTML(player.position || "غير محدد")}</p>${player.bio ? `<p class="muted">${escapeHTML(player.bio)}</p>` : ""}</article>`).join("");
 }
 
+function matchStatusLabel(status) {
+  return ({ scheduled: "قادمة", live: "جارية", completed: "منتهية", cancelled: "ملغاة" })[status] || status;
+}
+
+function formatMatchDate(value) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? escapeHTML(value) : date.toLocaleString("ar-IQ", { dateStyle: "medium", timeStyle: "short" });
+}
+
+function renderMatchAdminForm() {
+  const area = document.getElementById("matchAdminForm");
+  if (accountRole !== "admin") {
+    area.innerHTML = "";
+    return;
+  }
+  area.innerHTML = `<form class="form match-form" onsubmit="createMatch(event)">
+    <h3>إضافة مباراة</h3>
+    <label for="matchHomeTeam">الفريق الأول</label>
+    <input id="matchHomeTeam" name="home_team" maxlength="80" required placeholder="اسم الفريق">
+    <label for="matchAwayTeam">الفريق الثاني</label>
+    <input id="matchAwayTeam" name="away_team" maxlength="80" required placeholder="اسم الفريق">
+    <label for="matchStartsAt">موعد المباراة</label>
+    <input id="matchStartsAt" name="starts_at" type="datetime-local" required>
+    <label for="matchVenue">الملعب أو المكان</label>
+    <input id="matchVenue" name="venue" maxlength="120" placeholder="اسم الملعب أو المنطقة">
+    <button class="primary" type="submit">إضافة المباراة</button>
+  </form>`;
+}
+
+async function loadMatches() {
+  const container = document.getElementById("matchList");
+  renderMatchAdminForm();
+  const { data, error } = await supabaseClient.from("matches")
+    .select("id,home_team,away_team,starts_at,venue,status,home_score,away_score")
+    .order("starts_at", { ascending: true });
+  if (error) {
+    console.error("loadMatches:", error);
+    container.innerHTML = `<p class="muted">تعذر تحميل المباريات: ${escapeHTML(error.message)}. تأكد من إنشاء جدول matches وتشغيل صلاحياته.</p>`;
+    return;
+  }
+  matches = data || [];
+  renderMatches(container, matches);
+}
+
+function renderMatches(container, rows) {
+  if (!rows.length) {
+    container.innerHTML = "<p class=\"muted\">ماكو مباريات مضافة حالياً.</p>";
+    return;
+  }
+  container.innerHTML = rows.map(match => `<article class="card match-card">
+    <div class="match-teams"><span>${escapeHTML(match.home_team)}</span><span class="match-score">${match.home_score == null ? "VS" : `${match.home_score} - ${match.away_score}`}</span><span>${escapeHTML(match.away_team)}</span></div>
+    <p class="match-meta">🗓 ${formatMatchDate(match.starts_at)}</p>
+    ${match.venue ? `<p class="match-meta">📍 ${escapeHTML(match.venue)}</p>` : ""}
+    <p class="status">${matchStatusLabel(match.status)}</p>
+    ${accountRole === "admin" ? `<form class="match-controls" onsubmit="updateMatch(event, '${escapeHTML(match.id)}')">
+      <select name="status" aria-label="حالة المباراة">
+        <option value="scheduled" ${match.status === "scheduled" ? "selected" : ""}>قادمة</option>
+        <option value="live" ${match.status === "live" ? "selected" : ""}>جارية</option>
+        <option value="completed" ${match.status === "completed" ? "selected" : ""}>منتهية</option>
+        <option value="cancelled" ${match.status === "cancelled" ? "selected" : ""}>ملغاة</option>
+      </select>
+      <input name="home_score" type="number" min="0" step="1" aria-label="نتيجة الفريق الأول" value="${match.home_score ?? ""}" placeholder="نتيجة الأول">
+      <input name="away_score" type="number" min="0" step="1" aria-label="نتيجة الفريق الثاني" value="${match.away_score ?? ""}" placeholder="نتيجة الثاني">
+      <button class="primary" type="submit">حفظ الحالة والنتيجة</button>
+    </form>` : ""}
+  </article>`).join("");
+}
+
+async function createMatch(event) {
+  event.preventDefault();
+  if (!currentUser || accountRole !== "admin") return showMessage("إضافة المباريات متاحة للإدارة فقط.");
+  const form = event.currentTarget;
+  const homeTeam = form.elements.home_team.value.trim();
+  const awayTeam = form.elements.away_team.value.trim();
+  const startsAt = form.elements.starts_at.value;
+  if (!homeTeam || !awayTeam || !startsAt) return showMessage("أكمل الفريقين وموعد المباراة.");
+  if (homeTeam.localeCompare(awayTeam, "ar", { sensitivity: "base" }) === 0) return showMessage("اختار فريقين مختلفين.");
+  const { error } = await supabaseClient.from("matches").insert({
+    home_team: homeTeam,
+    away_team: awayTeam,
+    starts_at: new Date(startsAt).toISOString(),
+    venue: form.elements.venue.value.trim() || null,
+    created_by: currentUser.id
+  });
+  if (error) {
+    console.error("createMatch:", error);
+    return showMessage("تعذر إضافة المباراة: " + error.message);
+  }
+  form.reset();
+  showMessage("تمت إضافة المباراة.");
+  await loadMatches();
+}
+
+async function updateMatch(event, matchId) {
+  event.preventDefault();
+  if (!currentUser || accountRole !== "admin") return showMessage("تعديل المباريات متاح للإدارة فقط.");
+  const form = event.currentTarget;
+  const status = form.elements.status.value;
+  const homeValue = form.elements.home_score.value;
+  const awayValue = form.elements.away_score.value;
+  if ((homeValue === "") !== (awayValue === "")) return showMessage("اكتب نتيجة الفريقين معاً أو اتركهما فارغين.");
+  if (status === "completed" && (homeValue === "" || awayValue === "")) return showMessage("أدخل النتيجتين قبل إنهاء المباراة.");
+  const { error } = await supabaseClient.from("matches").update({
+    status,
+    home_score: homeValue === "" ? null : Number(homeValue),
+    away_score: awayValue === "" ? null : Number(awayValue)
+  }).eq("id", matchId);
+  if (error) {
+    console.error("updateMatch:", error);
+    return showMessage("تعذر تحديث المباراة: " + error.message);
+  }
+  showMessage("تم تحديث المباراة.");
+  await loadMatches();
+  await loadResults();
+}
+
+async function loadResults() {
+  const container = document.getElementById("resultList");
+  const { data, error } = await supabaseClient.from("matches")
+    .select("id,home_team,away_team,starts_at,venue,status,home_score,away_score")
+    .eq("status", "completed")
+    .order("starts_at", { ascending: false });
+  if (error) {
+    console.error("loadResults:", error);
+    container.innerHTML = `<p class="muted">تعذر تحميل النتائج: ${escapeHTML(error.message)}. تأكد من إعداد جدول matches.</p>`;
+    return;
+  }
+  if (!data?.length) {
+    container.innerHTML = "<p class=\"muted\">ماكو نتائج مسجلة حالياً.</p>";
+    return;
+  }
+  container.innerHTML = data.map(match => `<article class="card match-card">
+    <div class="match-teams"><span>${escapeHTML(match.home_team)}</span><span class="match-score">${match.home_score} - ${match.away_score}</span><span>${escapeHTML(match.away_team)}</span></div>
+    <p class="match-meta">🗓 ${formatMatchDate(match.starts_at)}</p>
+    ${match.venue ? `<p class="match-meta">📍 ${escapeHTML(match.venue)}</p>` : ""}
+  </article>`).join("");
+}
+
 function urlBase64ToUint8Array(value) {
   const padding = "=".repeat((4 - value.length % 4) % 4);
   const raw = atob((value + padding).replace(/-/g, "+").replace(/_/g, "/"));
@@ -993,6 +1184,8 @@ async function initializeApp() {
         await loadPlayerProfile();
         await loadPlayers();
       }
+      if (document.getElementById("matches").classList.contains("active")) await loadMatches();
+      if (document.getElementById("results").classList.contains("active")) await loadResults();
     }, 0);
   });
 }
